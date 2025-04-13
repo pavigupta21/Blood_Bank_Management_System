@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="w-full h-screen flex justify-center items-center bg-zinc-800 text-white">
+        <form class="absolute top-5 right-5 flex space-x-3">
+            <a class="bg-red-500 hover:bg-red-600 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/logout">Logout</a>
+            <a class="bg-gray-600 hover:bg-gray-700 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/signout">Sign Out</a>
+        </form>
+        <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96">
+            <h3 class="text-xl font-semibold text-center mb-4">Welcome to Blood Bank Management System</h3>
+            <div class="w-full">
+                <!-- <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded mb-5">Add New Donor</button>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded mb-5">Read Donors</button>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded mb-5">Increase Stock</button>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded mb-5">Decrease Stock</button>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded mb-5">Add New Patient</button>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded mb-5">Read Patients</button> -->
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/addnewdonor">Add New Donor</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/readdonors">Read Donors</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/incstock">Increase Stock</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/decstock">Decrease Stock</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/addnewpatient">Add New Patient</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/readpatients">Read Patients</a>
+            </div>
+        </div>
+    </div>
+   
+</body>
+
+</html>

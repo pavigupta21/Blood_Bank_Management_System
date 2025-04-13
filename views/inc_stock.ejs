@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Increase Stock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-800 text-white min-h-screen flex flex-col items-center justify-center px-4">
+<a href="/home" class="absolute top-4 left-4 text-blue-500 hover:text-blue-700 font-semibold">back to home</a>
+    <h1 class="text-3xl font-bold mb-8">Increase Stock</h1>
+
+    <form method="POST" action="/incstock" class="flex flex-col md:flex-row gap-6 mb-10 items-center bg-zinc-900 p-6 rounded-lg shadow-lg">
+        <div class="flex flex-col">
+            <label for="blood_group" class="mb-2">Enter Blood Group</label>
+            <input placeholder="Eg: AB+" id="blood_group" name="blood_group" required
+                   class="px-4 py-2 rounded-md bg-zinc-700 text-white border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div class="flex flex-col">
+            <label for="units" class="mb-2">Enter Units to be Added</label>
+            <input placeholder="Eg: 100" id="units" name="units" required min="1"
+                   class="px-4 py-2 rounded-md bg-zinc-700 text-white border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <button type="submit"
+                class="self-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md transition duration-300 mt-8">
+            Add Units
+        </button>
+    </form>
+
+    <div class="overflow-x-auto w-full max-w-md bg-zinc-900 rounded-lg shadow-lg">
+        <table class="min-w-full text-center">
+            <thead>
+                <tr class="bg-zinc-700">
+                    <th class="py-3 px-4">Blood Group</th>
+                    <th class="py-3 px-4">Units</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% bloodData.forEach(item => { %>
+                    <tr class="border-t border-zinc-600 hover:bg-zinc-700">
+                        <td class="py-2 px-4"><%= item.blood_group %></td>
+                        <td class="py-2 px-4"><%= item.units %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
