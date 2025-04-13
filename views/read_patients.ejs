@@ -23,7 +23,8 @@
                         <h3 class="xl mt-3 tracking-tighter">Hospital Name: <%=e.hospital_name%></h3>
                         <h3 class="xl mt-3 tracking-tighter">Hospital Address: <%=e.hospital_address%></h3>
                         <h3 class="xl mt-3 tracking-tighter">Blood Group: <%=e.blood_group%></h3>
-                        <h3 class="xl mt-3 tracking-tighter">Units Transfused: <%=e.units_transfused%></h3>
+                        <h3 class="xl mt-3 mb-6 tracking-tighter">Units Transfused: <%=e.units_transfused%></h3>
+                        <a class="text-blue-400 hover:text-blue-600" href="/transfusionhistory/<%=e.patient_id%>">All transfusions history</a>
                         <div class="flex gap-3 mt-10">
                             <a class="text-gray-400 hover:text-gray-600" href="/editpatient/<%=e.patient_id%>">Edit</a>
                             <a class="text-red-500 hover:text-red-700" href="/deletepatient/<%=e.patient_id%>">Delete</a>

@@ -104,9 +104,10 @@ app.post('/incstock', async (req, res) => {
     }
 });
 app.get('/decstock', async (req, res) => {
+    const errorMessage = req.query.error;
     try {
         const [rows] = await dbtable.query('SELECT * FROM BloodGroup');
-        res.render('dec_stock', { bloodData: rows });
+        res.render('dec_stock', { bloodData: rows, errorMessage });
     } catch (error) {
         console.error(error);
         res.send('Error loading stock page');
@@ -115,11 +116,11 @@ app.get('/decstock', async (req, res) => {
 app.post('/decstock', async (req, res) => {
     const { blood_group, units } = req.body;
     try {
-        await dbtable.query('UPDATE BloodGroup SET units = units - ? WHERE blood_group = ?', [units, blood_group]);
+        await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units]);
         res.redirect('/decstock');
     } catch (error) {
-        console.error(error);
-        res.send('Error updating stock');
+        console.error("Error in procedure:", error);
+        return res.redirect('/decstock?error=Not enough stock available!');
     }
 });
 app.get("/addnewdonor", (req, res) => {
@@ -130,9 +131,16 @@ app.post("/addnewdonor", async (req, res) => {
         const {name,age,gender,contact,address,blood_group,units_donated}=req.body;
         await dbtable.query('INSERT INTO Donor (name, age, gender, contact, address, blood_group, units_donated) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                       [name, age, gender, contact, address, blood_group, units_donated]);
+       // Get the last inserted donor_id (AUTO_INCREMENT field)
+    const [rows] = await dbtable.query('SELECT LAST_INSERT_ID() AS donor_id');
+    const donor_id = rows[0].donor_id;
+
+    // Insert into Donor_logtable, using the donor_id from the Donor table
+    await dbtable.query('INSERT INTO Donor_logtable (donor_id, units_donated) VALUES (?, ?)', 
+                        [donor_id, units_donated]);
         // Update the blood group table to reflect the new donor's donation
         await dbtable.query('UPDATE BloodGroup SET units = units + ? WHERE blood_group = ?', [units_donated, blood_group]);
-        // Redirect to the incstock page after adding the donor
+        // Redirect to the read donors page page after adding the donor
         res.redirect('/readdonors');
     } catch (error) {
         console.error(error);
@@ -140,20 +148,39 @@ app.post("/addnewdonor", async (req, res) => {
     }
 });
 app.get("/addnewpatient", (req, res) => {
-    res.render("add_new_patient");
+    const errorMessage = req.query.error;
+    res.render('add_new_patient', { errorMessage });
+    
+
 });
 app.post("/addnewpatient", async (req, res) => {
     try {
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
+         // 🔍 1. Call procedure to check & update stock FIRST
+         try {
+            await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units_transfused]);
+        } catch (error) {
+            console.error("Error in procedure:", error);
+            return res.redirect('/addnewpatient?error=Not enough stock available!');
+        }
         await dbtable.query('INSERT INTO Patient (name, age, gender, contact, hospital_name,hospital_address, blood_group, units_transfused) VALUES (?, ?, ?, ?, ?, ?, ?,?)', 
                       [name, age, gender, contact,hospital_name,hospital_address, blood_group, units_transfused]);
-        // Update the blood group table to reflect the new patient's transfusion
-        await dbtable.query('UPDATE BloodGroup SET units = units - ? WHERE blood_group = ?', [units_transfused, blood_group]);
-        // Redirect to the incstock page after adding the donor
+        // Get the last inserted patient_id (AUTO_INCREMENT field)
+        const [rows] = await dbtable.query('SELECT LAST_INSERT_ID() AS patient_id');
+        const patient_id = rows[0].patient_id;
+        // Insert into Patient_logtable, using the patient_id from the Patient table
+        try {
+            await dbtable.query('INSERT INTO Patient_logtable (patient_id, units_transfused) VALUES (?, ?)', 
+                [patient_id, units_transfused]);
+        } catch (error) {
+            console.error("Error inserting into Patient_logtable:", error);
+        }
+       
+        // Redirect to the read patients page after adding the donor
         res.redirect('/readpatients');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Database error while adding new donor details');
+        res.status(500).send('Database error while adding new patient details');
     }
 });
 
@@ -257,4 +284,103 @@ app.get('/editpatient/:patient_id',async (req,res)=>{
         res.status(500).send('Database error while fetching patient details');
     }
 });
+app.get('/donorlogtable', async (req, res) => {
+    try {
+        const [rows] = await dbtable.query('SELECT l.entry_id, l.donor_id, d.name, l.units_donated, l.date_of_donation FROM donor_logtable l JOIN Donor d ON l.donor_id = d.donor_id');
+        res.render('donor_log_table', { logtableData: rows });
+    } catch (error) {
+        console.error(error);
+        res.send('Error loading donor log table page');
+    }
+});
+app.get('/deletedonorlog/:entry_id', async (req, res) => {
+    const entry_id = req.params.entry_id;
+    try {
+        await dbtable.query('DELETE FROM donor_logtable WHERE entry_id = ?', [entry_id]);
+        res.redirect('/donorlogtable');
+    } catch (error) {
+        console.error(error);
+        res.send('Error deleting log entry');
+    }
+});
+app.get('/patientlogtable', async (req, res) => {
+    try {
+        const [rows] = await dbtable.query('SELECT l.entry_id, l.patient_id, p.name, l.units_transfused, l.date_of_transfusion FROM Patient_logtable l JOIN Patient p ON l.patient_id = p.patient_id');
+        res.render('patient_log_table', { logtableData: rows });
+    } catch (error) {
+        console.error(error);
+        res.send('Error loading patient log table page');
+    }
+});
+app.get('/deletepatientlog/:entry_id', async (req, res) => {
+    const entry_id = req.params.entry_id;
+    try {
+        await dbtable.query('DELETE FROM patient_logtable WHERE entry_id = ?', [entry_id]);
+        res.redirect('/patientlogtable');
+    } catch (error) {
+        console.error(error);
+        res.send('Error deleting log entry');
+    }
+});
+app.get('/donationhistory/:donor_id', async (req, res) => {
+    const donorId = req.params.donor_id;
+    const [donorRows] = await dbtable.query('SELECT * from Donor where donor_id=?',[donorId]); // fetch from Donor table
+    const [donorLogs] = await dbtable.query('SELECT * from donor_logtable where donor_id=?',[donorId]); // fetch from Donor_logtable
+    const donor = donorRows[0];
+    res.render('donation_history', { donor, donorLogs });
+});
+app.post('/adddonation/:donor_id', async (req, res) => {
+    const { units, date } = req.body;
+    const donorId = req.params.donor_id;
+
+    await dbtable.query(
+        "INSERT INTO donor_logtable (donor_id, units_donated, date_of_donation) VALUES (?, ?, ?)",
+        [donorId, units, date]
+    );
+    await dbtable.query('UPDATE Donor SET units_donated = units_donated + ? WHERE donor_id = ?', [units, donorId]);
+    await dbtable.query('UPDATE BloodGroup SET units = units + ? WHERE blood_group = (SELECT blood_group FROM Donor WHERE donor_id = ?)', [units, donorId]);
+    res.redirect(`/donationhistory/${donorId}`);
+});
+app.get('/transfusionhistory/:patient_id', async (req, res) => {
+    const patientId = req.params.patient_id;
+    const errorMessage = req.query.error;
+    const [patientRows] = await dbtable.query('SELECT * from Patient where patient_id=?',[patientId]); // fetch from Patient table
+    const [patientLogs] = await dbtable.query('SELECT * from patient_logtable where patient_id=?',[patientId]); // fetch from Patient_logtable
+    const patient = patientRows[0];
+    res.render('transfusion_history', { patient, patientLogs,errorMessage });
+});
+app.post('/addtransfusion/:patient_id', async (req, res) => {
+    const { units, date } = req.body;
+    const patientId = req.params.patient_id;
+
+    try {
+       
+        const [patient] = await dbtable.query('SELECT blood_group FROM Patient WHERE patient_id = ?', [patientId]);
+        const blood_group = patient[0].blood_group;
+        try {
+            await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units]);
+        } catch (error) {
+            console.error("Error in procedure:", error);
+            return res.redirect(`/transfusionhistory/${patientId}?error=Not enough stock available!`);
+        }
+        
+        await dbtable.query(
+            "INSERT INTO patient_logtable (patient_id, units_transfused, date_of_transfusion) VALUES (?, ?, ?)",
+            [patientId, units, date]
+        );
+
+        await dbtable.query(
+            'UPDATE Patient SET units_transfused = units_transfused + ? WHERE patient_id = ?',
+            [units, patientId]
+        );
+        res.redirect(`/transfusionhistory/${patientId}`);
+
+    } catch (error) {
+        console.error("Error from procedure or database:", error);
+        
+    }
+});
+
+
+
 app.listen(4000);

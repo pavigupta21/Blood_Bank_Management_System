@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Donation History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen p-8">
+    <a href="/readdonors" class="text-blue-400 hover:text-blue-600 mb-6 inline-block">← Back to All Donors</a>
+    <h1 class="text-3xl font-bold mb-6">Donation History for <%= donor.name %></h1>
+
+    <!-- Donation Table -->
+    <div class="bg-zinc-800 rounded-lg shadow p-6 mb-10 overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-sm uppercase bg-zinc-700">
+                    <th class="py-3 px-4">Units Donated</th>
+                    <th class="py-3 px-4">Date of Donation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% donorLogs.forEach(log => { %>
+                    <tr class="border-t border-zinc-700 hover:bg-zinc-700">
+                        <td class="py-2 px-4"><%= log.units_donated %></td>
+                        <td class="py-2 px-4"><%= log.date_of_donation.toLocaleDateString('en-CA') %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add New Donation Entry -->
+    <h2 class="text-xl font-semibold mb-4">Add New Donation Entry</h2>
+    <form action="/adddonation/<%= donor.donor_id %>" method="POST" class="space-y-4 bg-zinc-800 p-6 rounded-lg w-full max-w-md">
+        <div>
+            <label for="units" class="block mb-1">Units Donated</label>
+            <input type="number" name="units" id="units" required class="w-full px-3 py-2 rounded bg-zinc-700 text-white">
+        </div>
+        <div>
+            <label for="date" class="block mb-1">Date of Donation</label>
+            <input type="date" name="date" id="date" required class="w-full px-3 py-2 rounded bg-zinc-700 text-white">
+        </div>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">Add Donation</button>
+    </form>
+</body>
+</html>
