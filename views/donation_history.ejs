@@ -9,7 +9,7 @@
     <a href="/readdonors" class="text-blue-400 hover:text-blue-600 mb-6 inline-block">← Back to All Donors</a>
     <h1 class="text-3xl font-bold mb-6">Donation History for <%= donor.name %></h1>
 
-    <!-- Donation Table -->
+   
     <div class="bg-zinc-800 rounded-lg shadow p-6 mb-10 overflow-x-auto">
         <table class="w-full text-left">
             <thead>
@@ -29,7 +29,7 @@
         </table>
     </div>
 
-    <!-- Add New Donation Entry -->
+    
     <h2 class="text-xl font-semibold mb-4">Add New Donation Entry</h2>
     <form action="/adddonation/<%= donor.donor_id %>" method="POST" class="space-y-4 bg-zinc-800 p-6 rounded-lg w-full max-w-md">
         <div>

@@ -22,21 +22,17 @@ app.get('/logout',(req,res)=>{
 });
 app.get('/signout',async (req,res)=>{
     try {
-        // Get the token from cookies
         const token = req.cookies.token;
-        if (!token) return res.redirect('/signup'); // If no token, just redirect
+        if (!token) return res.redirect('/signup');
 
-        // Verify and decode the token
+       
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userEmail = decoded.email; // Extract email from token
-
-        // Delete user from the database
+        const userEmail = decoded.email; 
         await dbtable.query('DELETE FROM DBadmin WHERE email = ?', [userEmail]);
 
-        // Clear the cookie
+        
         res.clearCookie('token');
 
-        // Redirect to signup page
         res.redirect('/');
     } catch (error) {
         console.error(error);
@@ -131,16 +127,16 @@ app.post("/addnewdonor", async (req, res) => {
         const {name,age,gender,contact,address,blood_group,units_donated}=req.body;
         await dbtable.query('INSERT INTO Donor (name, age, gender, contact, address, blood_group, units_donated) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                       [name, age, gender, contact, address, blood_group, units_donated]);
-       // Get the last inserted donor_id (AUTO_INCREMENT field)
+       
     const [rows] = await dbtable.query('SELECT LAST_INSERT_ID() AS donor_id');
     const donor_id = rows[0].donor_id;
 
-    // Insert into Donor_logtable, using the donor_id from the Donor table
+  
     await dbtable.query('INSERT INTO Donor_logtable (donor_id, units_donated) VALUES (?, ?)', 
                         [donor_id, units_donated]);
-        // Update the blood group table to reflect the new donor's donation
+        
         await dbtable.query('UPDATE BloodGroup SET units = units + ? WHERE blood_group = ?', [units_donated, blood_group]);
-        // Redirect to the read donors page page after adding the donor
+        
         res.redirect('/readdonors');
     } catch (error) {
         console.error(error);
@@ -156,7 +152,7 @@ app.get("/addnewpatient", (req, res) => {
 app.post("/addnewpatient", async (req, res) => {
     try {
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
-         // 🔍 1. Call procedure to check & update stock FIRST
+        
          try {
             await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units_transfused]);
         } catch (error) {
@@ -165,10 +161,10 @@ app.post("/addnewpatient", async (req, res) => {
         }
         await dbtable.query('INSERT INTO Patient (name, age, gender, contact, hospital_name,hospital_address, blood_group, units_transfused) VALUES (?, ?, ?, ?, ?, ?, ?,?)', 
                       [name, age, gender, contact,hospital_name,hospital_address, blood_group, units_transfused]);
-        // Get the last inserted patient_id (AUTO_INCREMENT field)
+       
         const [rows] = await dbtable.query('SELECT LAST_INSERT_ID() AS patient_id');
         const patient_id = rows[0].patient_id;
-        // Insert into Patient_logtable, using the patient_id from the Patient table
+        
         try {
             await dbtable.query('INSERT INTO Patient_logtable (patient_id, units_transfused) VALUES (?, ?)', 
                 [patient_id, units_transfused]);
@@ -176,7 +172,7 @@ app.post("/addnewpatient", async (req, res) => {
             console.error("Error inserting into Patient_logtable:", error);
         }
        
-        // Redirect to the read patients page after adding the donor
+        
         res.redirect('/readpatients');
     } catch (error) {
         console.error(error);
@@ -344,8 +340,8 @@ app.post('/adddonation/:donor_id', async (req, res) => {
 app.get('/transfusionhistory/:patient_id', async (req, res) => {
     const patientId = req.params.patient_id;
     const errorMessage = req.query.error;
-    const [patientRows] = await dbtable.query('SELECT * from Patient where patient_id=?',[patientId]); // fetch from Patient table
-    const [patientLogs] = await dbtable.query('SELECT * from patient_logtable where patient_id=?',[patientId]); // fetch from Patient_logtable
+    const [patientRows] = await dbtable.query('SELECT * from Patient where patient_id=?',[patientId]); 
+    const [patientLogs] = await dbtable.query('SELECT * from patient_logtable where patient_id=?',[patientId]); 
     const patient = patientRows[0];
     res.render('transfusion_history', { patient, patientLogs,errorMessage });
 });
