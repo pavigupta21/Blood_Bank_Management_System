@@ -11,6 +11,11 @@
         <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96">
             <h3 class="text-xl font-semibold text-center mb-4">Login</h3>
             <form action="/login" method="post">
+                <% if (errorMessage) { %>
+                    <div class="bg-red-500 text-white text-sm px-4 py-2 mb-4 rounded">
+                        <%= errorMessage %>
+                    </div>
+                <% } %>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Email</label>
                     <input type="email" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email" name="email">

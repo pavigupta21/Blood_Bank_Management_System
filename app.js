@@ -42,6 +42,10 @@ app.get('/signout',async (req,res)=>{
 app.post('/signup', async (req, res) => {
     try {
         const {name,email,password}=req.body;
+        const [existing] = await dbtable.query('SELECT * FROM DBadmin WHERE email = ?', [email]);
+        if (existing.length > 0) {
+            return res.render('index', { errorMessage: 'User with this email already exists.' });
+        }
         const saltRounds=10;
         const hashedPassword=await bcrypt.hash(password,saltRounds);
         await dbtable.query('INSERT INTO DBadmin (name, email, password) VALUES (?, ?, ?)', 
@@ -55,7 +59,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 app.get('/login', (req, res) => {
-    res.render('login');
+    res.render('login', { errorMessage: null });
 });
 app.get('/home', (req, res) => {
     res.render('home');
@@ -65,19 +69,19 @@ app.post('/login', async (req, res) => {
         const {email,password}=req.body;
         const [rows] = await dbtable.query('SELECT * FROM DBadmin WHERE email = ?', [email]);
         if (rows.length === 0) {
-            return res.status(401).send('Invalid email or password');
+            return res.render('login', { errorMessage: 'Invalid email or password' });
         }
         const user = rows[0];
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).send('Invalid email or password');
+            return res.render('login', { errorMessage: 'Invalid email or password' });
         }
         const token=jwt.sign({email},process.env.JWT_SECRET);
         res.cookie("token", token, { httpOnly: true, secure: true, sameSite: 'strict' });
         res.redirect('/home');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Database error while login');
+        return res.render('login', { errorMessage: 'Database error while logging in' });
     }
 });
 app.get('/incstock', async (req, res) => {
