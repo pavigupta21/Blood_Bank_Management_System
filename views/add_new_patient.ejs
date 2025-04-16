@@ -15,16 +15,16 @@
                 <div class="bg-red-500 text-white p-2 rounded mb-4">
                     <%= errorMessage %>
                 </div>
-                <% } %>
-                
-            <form action="/addnewpatient" method="post">
+            <% } %>
+
+            <form action="/addnewpatient" method="post" onsubmit="return validateForm()">
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Patient Name</label>
                     <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's full name" name="name">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Age</label>
-                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's age" name="age">
+                    <input type="number" id="ageInput" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's age" name="age">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Gender</label>
@@ -54,7 +54,16 @@
             </form>
         </div>
     </div>
-    
-</body>
 
+    <script>
+        function validateForm() {
+            const age = document.getElementById('ageInput').value;
+            if (parseInt(age) <= 18) {
+                alert("Age must be greater than 18. Please re-enter a valid age.");
+                return false; // prevent form submission
+            }
+            return true;
+        }
+    </script>
+</body>
 </html>

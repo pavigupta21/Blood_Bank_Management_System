@@ -9,7 +9,7 @@
 <a href="/home" class="absolute top-4 left-4 text-blue-500 hover:text-blue-700 font-semibold">back to home</a>
     <h1 class="text-3xl font-bold mb-8">Increase Stock</h1>
 
-    <form method="POST" action="/incstock" class="flex flex-col md:flex-row gap-6 mb-10 items-center bg-zinc-900 p-6 rounded-lg shadow-lg">
+    <form method="POST" action="/incstock" onsubmit="return validateStockForm()" class="flex flex-col md:flex-row gap-6 mb-10 items-center bg-zinc-900 p-6 rounded-lg shadow-lg">
         <div class="flex flex-col">
             <label for="blood_group" class="mb-2">Enter Blood Group</label>
             <input placeholder="Eg: AB+" id="blood_group" name="blood_group" required
@@ -45,5 +45,25 @@
         </table>
     </div>
 
+    <script>
+        function validateStockForm() {
+            const validBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+            const bloodGroup = document.getElementById('blood_group').value.trim().toUpperCase();
+            const unitsValue = document.getElementById('units').value.trim();
+            const units = parseInt(unitsValue);
+
+            if (!validBloodGroups.includes(bloodGroup)) {
+                alert("Invalid blood group. Please enter a valid one: A+, A-, B+, B-, AB+, AB-, O+, O-");
+                return false;
+            }
+
+            if (isNaN(units) || units < 1) {
+                alert("Please enter a valid number of units (must be 1 or more).");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 </html>

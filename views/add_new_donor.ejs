@@ -11,14 +11,14 @@
         <a href="/home" class="absolute top-4 left-4 text-blue-500 hover:text-blue-700 font-semibold">back to home</a>
         <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96">
             <h3 class="text-xl font-semibold text-center mb-4">Fill Donor Details</h3>
-            <form action="/addnewdonor" method="post">
+            <form action="/addnewdonor" method="post" onsubmit="return validateForm()">
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Donor Name</label>
                     <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter donor's full name" name="name">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Age</label>
-                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter donor's age" name="age">
+                    <input type="number" id="ageInput" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter donor's age" name="age">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Gender</label>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Blood Group</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Eg: AB+" name="blood_group">
+                    <input type="text" id="bloodGroupInput" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Eg: AB+" name="blood_group">
                 </div>
                 <div class="mb-6">
                     <label class="block mb-1 text-sm">Units Donated</label>
@@ -44,6 +44,25 @@
             </form>
         </div>
     </div>
-</body>
 
+    <script>
+        function validateForm() {
+            const validBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+            const bloodGroup = document.getElementById('bloodGroupInput').value.trim().toUpperCase();
+            const age = parseInt(document.getElementById('ageInput').value);
+
+            if (isNaN(age) || age < 18) {
+                alert("Invalid age. Donor must be at least 18 years old.");
+                return false;
+            }
+
+            if (!validBloodGroups.includes(bloodGroup)) {
+                alert("Invalid blood group. Please enter one of the following: A+, A-, B+, B-, AB+, AB-, O+, O-");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
 </html>
