@@ -31,6 +31,9 @@
 
     
     <h2 class="text-xl font-semibold mb-4">Add New Donation Entry</h2>
+    <% if (typeof error !== 'undefined') { %>
+        <div class="bg-red-600 text-white p-2 rounded mb-4 text-sm text-center"><%= error %></div>
+      <% } %>
     <form action="/adddonation/<%= donor.donor_id %>" method="POST" class="space-y-4 bg-zinc-800 p-6 rounded-lg w-full max-w-md">
         <div>
             <label for="units" class="block mb-1">Units Donated</label>

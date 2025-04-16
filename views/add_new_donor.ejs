@@ -11,6 +11,10 @@
         <a href="/home" class="absolute top-4 left-4 text-blue-500 hover:text-blue-700 font-semibold">back to home</a>
         <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96">
             <h3 class="text-xl font-semibold text-center mb-4">Fill Donor Details</h3>
+            <% if (typeof error !== 'undefined') { %>
+                <div class="bg-red-600 text-white p-2 rounded mb-4 text-sm text-center"><%= error %></div>
+              <% } %>
+        
             <form action="/addnewdonor" method="post">
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Donor Name</label>

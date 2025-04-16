@@ -95,6 +95,15 @@ app.get('/incstock', async (req, res) => {
 });
 app.post('/incstock', async (req, res) => {
     const { blood_group, units } = req.body;
+    const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+    if (!validBloodGroups.includes(blood_group)) {
+        const [rows] = await dbtable.query('SELECT * FROM BloodGroup');
+        return res.render('inc_stock', { error: 'Invalid blood group entered', bloodData: rows });
+    }
+    if (units <= 0) {
+        const [rows] = await dbtable.query('SELECT * FROM BloodGroup');
+        return res.render('inc_stock', { error: 'units donated must be greater than 0', bloodData: rows });
+    }
     try {
         await dbtable.query('UPDATE BloodGroup SET units = units + ? WHERE blood_group = ?', [units, blood_group]);
         res.redirect('/incstock');
@@ -115,6 +124,14 @@ app.get('/decstock', async (req, res) => {
 });
 app.post('/decstock', async (req, res) => {
     const { blood_group, units } = req.body;
+    const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+    if (!validBloodGroups.includes(blood_group)) {
+        return res.redirect('/decstock?error=Invalid blood group entered');
+    }
+    if (units<=0) {
+        return res.redirect('/decstock?error=Units must be greater than 0');
+    }
+
     try {
         await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units]);
         res.redirect('/decstock');
@@ -129,6 +146,19 @@ app.get("/addnewdonor", (req, res) => {
 app.post("/addnewdonor", async (req, res) => {
     try {
         const {name,age,gender,contact,address,blood_group,units_donated}=req.body;
+        const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+
+        // Validation check
+        if (age < 18 || age>65) {
+            return res.render('add_new_donor', { error: 'Age of donor must lie between 18 and 65' });
+        }
+
+        if (!validBloodGroups.includes(blood_group)) {
+            return res.render('add_new_donor', { error: 'Invalid blood group entered.' });
+        }
+        if( units_donated <= 0) {
+            return res.render('add_new_donor', { error: 'Units donated must be greater than 0.' });
+        }
         await dbtable.query('INSERT INTO Donor (name, age, gender, contact, address, blood_group, units_donated) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                       [name, age, gender, contact, address, blood_group, units_donated]);
        
@@ -156,7 +186,13 @@ app.get("/addnewpatient", (req, res) => {
 app.post("/addnewpatient", async (req, res) => {
     try {
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
-        
+        const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        if (!validBloodGroups.includes(blood_group)) {
+            return res.render('add_new_patient', { errorMessage: 'Invalid blood group entered.' });
+        }
+        if( units_transfused <= 0) {
+            return res.render('add_new_patient', { errorMessage: 'Units transfused must be greater than 0.' });
+        }
          try {
             await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units_transfused]);
         } catch (error) {
@@ -205,6 +241,7 @@ app.get("/readpatients",async (req, res) => {
 app.get('/deletepatient/:patient_id',async (req,res)=>
     {   
         try {
+            await dbtable.query('DELETE FROM patient_logtable WHERE patient_id = ?', [req.params.patient_id]);
             await dbtable.query('DELETE FROM Patient WHERE patient_id = ?', [req.params.patient_id]);
             res.redirect('/readpatients');
         } catch (error) {
@@ -215,6 +252,7 @@ app.get('/deletepatient/:patient_id',async (req,res)=>
 app.get('/deletedonor/:donor_id',async (req,res)=>
     {   
         try {
+            await dbtable.query('DELETE FROM donor_logtable WHERE donor_id = ?', [req.params.donor_id]);
             await dbtable.query('DELETE FROM Donor WHERE donor_id = ?', [req.params.donor_id]);
             res.redirect('/readdonors');
         } catch (error) {
@@ -223,9 +261,24 @@ app.get('/deletedonor/:donor_id',async (req,res)=>
         }
 });
 app.post('/updatedonor/:donor_id',async (req,res)=>{
+
     try {
         const donorId = parseInt(req.params.donor_id);
         const {name,age,gender,contact,address,blood_group,units_donated}=req.body;
+        const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        const donor = { donor_id: donorId, name, age, gender, contact, address, blood_group, units_donated };
+         // Validation check
+         if (age < 18 || age > 65) {
+            return res.render('edit_donor', { error: 'Age of donor must lie between 18 and 65', donor });
+        }
+
+        if (!validBloodGroups.includes(blood_group)) {
+            return res.render('edit_donor', { error: 'Invalid blood group entered.', donor });
+        }
+
+        if (units_donated <= 0) {
+            return res.render('edit_donor', { error: 'Units donated must be greater than 0.', donor });
+        }
 
         const [result] = await dbtable.query('UPDATE Donor SET name = ?, age = ?, gender = ?, contact=?,address=?,blood_group=?,units_donated=? WHERE donor_id = ?', 
                                         [name, age, gender, contact, address, blood_group, units_donated, donorId]);
@@ -257,6 +310,17 @@ app.post('/updatepatient/:patient_id',async (req,res)=>{
     try {
         const patientId = parseInt(req.params.patient_id);
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
+        const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        const patient = { patient_id: patientId, name, age, gender, contact,hospital_name, hospital_address,blood_group, units_transfused };
+        // Validation check
+       
+       if (!validBloodGroups.includes(blood_group)) {
+           return res.render('edit_patient', { error: 'Invalid blood group entered.', patient });
+       }
+
+       if (units_transfused <= 0) {
+           return res.render('edit_patient', { error: 'Units transfused must be greater than 0.', patient });
+       }
 
         const [result] = await dbtable.query('UPDATE Patient SET name = ?, age = ?, gender = ?, contact=?,hospital_name=?,hospital_address=?,blood_group=?,units_transfused=? WHERE patient_id = ?', 
                                         [name, age, gender, contact, hospital_name,hospital_address, blood_group, units_transfused, patientId]);
@@ -332,7 +396,16 @@ app.get('/donationhistory/:donor_id', async (req, res) => {
 app.post('/adddonation/:donor_id', async (req, res) => {
     const { units, date } = req.body;
     const donorId = req.params.donor_id;
-
+    if (units <= 0) {
+        const [donorRows] = await dbtable.query('SELECT * from Donor where donor_id=?', [donorId]);
+        const [donorLogs] = await dbtable.query('SELECT * from donor_logtable where donor_id=?', [donorId]);
+        const donor = donorRows[0];
+        return res.render('donation_history', {
+            error: 'Number of units donated must be greater than 0',
+            donor,
+            donorLogs
+        });
+    }
     await dbtable.query(
         "INSERT INTO donor_logtable (donor_id, units_donated, date_of_donation) VALUES (?, ?, ?)",
         [donorId, units, date]
@@ -352,6 +425,16 @@ app.get('/transfusionhistory/:patient_id', async (req, res) => {
 app.post('/addtransfusion/:patient_id', async (req, res) => {
     const { units, date } = req.body;
     const patientId = req.params.patient_id;
+    if (units <= 0) {
+        const [patientRows] = await dbtable.query('SELECT * from Patient where patient_id=?', [patientId]);
+        const [patientLogs] = await dbtable.query('SELECT * from patient_logtable where patient_id=?', [patientId]);
+        const patient = patientRows[0];
+        return res.render('transfusion_history', {
+            errorMessage: 'Number of units transfused must be greater than 0',
+            patient,
+            patientLogs
+        });
+    }
 
     try {
        
