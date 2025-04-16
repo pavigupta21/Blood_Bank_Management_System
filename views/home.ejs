@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <div class="w-full h-screen flex justify-center items-center bg-zinc-800 text-white">
+    <div class="w-full h-full flex justify-center items-center bg-zinc-800 text-white">
         <form class="absolute top-5 right-5 flex space-x-3">
             <a class="bg-red-500 hover:bg-red-600 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/logout">Logout</a>
             <a class="bg-gray-600 hover:bg-gray-700 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/signout">Sign Out</a>
@@ -22,11 +22,35 @@
                 <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/decstock">Decrease Stock</a>
                 <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/addnewpatient">Add New Patient</a>
                 <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/readpatients">Read Patients</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="patientlogtable">Patient Log Table</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/patientlogtable">Patient Log Table</a>
+                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/New_req_for_blood">Request for Blood</a>
             </div>
         </div>
     </div>
-   
-</body>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white py-2 px-4 rounded-md shadow-lg flex items-center z-50">
+        <span id="toastMessage" class="mr-4">Request submitted successfully!</span>
+        <button id="closeToast" class="text-white font-bold px-2">✖</button>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const message = localStorage.getItem('bloodToast');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const closeToast = document.getElementById('closeToast');
+
+            if (message) {
+                toastMessage.textContent = message;
+                toast.classList.remove('hidden');
+                localStorage.removeItem('bloodToast');
+            }
+
+            closeToast?.addEventListener('click', () => {
+                toast.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
 </html>
