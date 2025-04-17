@@ -396,23 +396,28 @@ app.get('/donationhistory/:donor_id', async (req, res) => {
 app.post('/adddonation/:donor_id', async (req, res) => {
     const { units, date } = req.body;
     const donorId = req.params.donor_id;
+
+    const [donorRows] = await dbtable.query('SELECT * from Donor where donor_id=?', [donorId]);
+    const [donorLogs] = await dbtable.query('SELECT * from donor_logtable where donor_id=?', [donorId]);
+    const donor = donorRows[0];
+
     if (units <= 0) {
-        const [donorRows] = await dbtable.query('SELECT * from Donor where donor_id=?', [donorId]);
-        const [donorLogs] = await dbtable.query('SELECT * from donor_logtable where donor_id=?', [donorId]);
-        const donor = donorRows[0];
         return res.render('donation_history', {
             error: 'Number of units donated must be greater than 0',
             donor,
             donorLogs
         });
     }
-    await dbtable.query(
-        "INSERT INTO donor_logtable (donor_id, units_donated, date_of_donation) VALUES (?, ?, ?)",
-        [donorId, units, date]
-    );
-    await dbtable.query('UPDATE Donor SET units_donated = units_donated + ? WHERE donor_id = ?', [units, donorId]);
-    await dbtable.query('UPDATE BloodGroup SET units = units + ? WHERE blood_group = (SELECT blood_group FROM Donor WHERE donor_id = ?)', [units, donorId]);
-    res.redirect(`/donationhistory/${donorId}`);
+    try {
+        await dbtable.query('CALL add_donation_entry(?, ?, ?)', [donorId, units, date]);
+        res.redirect(`/donationhistory/${donorId}`);
+    } catch (err) {
+        return res.render('donation_history', {
+            error: err.sqlMessage || 'An error occurred',
+            donor,
+            donorLogs
+        });
+    }
 });
 app.get('/transfusionhistory/:patient_id', async (req, res) => {
     const patientId = req.params.patient_id;
@@ -425,10 +430,13 @@ app.get('/transfusionhistory/:patient_id', async (req, res) => {
 app.post('/addtransfusion/:patient_id', async (req, res) => {
     const { units, date } = req.body;
     const patientId = req.params.patient_id;
+
+    
+
     if (units <= 0) {
         const [patientRows] = await dbtable.query('SELECT * from Patient where patient_id=?', [patientId]);
-        const [patientLogs] = await dbtable.query('SELECT * from patient_logtable where patient_id=?', [patientId]);
-        const patient = patientRows[0];
+    const [patientLogs] = await dbtable.query('SELECT * from patient_logtable where patient_id=?', [patientId]);
+    const patient = patientRows[0]; 
         return res.render('transfusion_history', {
             errorMessage: 'Number of units transfused must be greater than 0',
             patient,
@@ -438,26 +446,35 @@ app.post('/addtransfusion/:patient_id', async (req, res) => {
 
     try {
        
-        const [patient] = await dbtable.query('SELECT blood_group FROM Patient WHERE patient_id = ?', [patientId]);
-        const blood_group = patient[0].blood_group;
+        const [patientRows] = await dbtable.query('SELECT * FROM Patient WHERE patient_id = ?', [patientId]);
+        const patient = patientRows[0];
+        const [bloodGroupRow] = await dbtable.query('SELECT blood_group FROM Patient WHERE patient_id = ?', [patientId]);
+        const blood_group = bloodGroupRow[0].blood_group;
         try {
-            await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units]);
+            await dbtable.query('CALL add_transfusion_entry(?,?,?,?)', [patientId, units, date, blood_group]);
+            return res.redirect(`/transfusionhistory/${patientId}`);
         } catch (error) {
-            console.error("Error in procedure:", error);
-            return res.redirect(`/transfusionhistory/${patientId}?error=Not enough stock available!`);
+            console.error("Procedure error:", error);
+            const [patientLogs] = await dbtable.query('SELECT * FROM patient_logtable WHERE patient_id = ?', [patientId]);
+
+            return res.render('transfusion_history', {
+                errorMessage: error.sqlMessage || 'An error occurred during transfusion',
+                patient,
+                patientLogs
+            });
         }
         
-        await dbtable.query(
-            "INSERT INTO patient_logtable (patient_id, units_transfused, date_of_transfusion) VALUES (?, ?, ?)",
-            [patientId, units, date]
-        );
+        // await dbtable.query(
+        //     "INSERT INTO patient_logtable (patient_id, units_transfused, date_of_transfusion) VALUES (?, ?, ?)",
+        //     [patientId, units, date]
+        // );
 
-        await dbtable.query(
-            'UPDATE Patient SET units_transfused = units_transfused + ? WHERE patient_id = ?',
-            [units, patientId]
-        );
+        // await dbtable.query(
+        //     'UPDATE Patient SET units_transfused = units_transfused + ? WHERE patient_id = ?',
+        //     [units, patientId]
+        // );
         res.redirect(`/transfusionhistory/${patientId}`);
-
+            
     } catch (error) {
         console.error("Error from procedure or database:", error);
         
