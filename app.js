@@ -220,19 +220,65 @@ app.post("/addnewpatient", async (req, res) => {
     }
 });
 
-app.get("/readdonors",async (req, res) => {
+app.get("/readdonors", async (req, res) => {
     try {
-        const [rows] = await dbtable.query('SELECT * FROM Donor');
-        res.render("read_donors",{donorData:rows});
+        const bloodGroup = req.query.blood_group;
+        const validBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+        let query = 'SELECT * FROM Donor';
+        let params = [];
+        let errorMessage = '';
+
+        if (bloodGroup && bloodGroup.trim() !== '') {
+            const input = bloodGroup.trim();
+            if (!validBloodGroups.includes(input)) {
+                errorMessage = 'Invalid blood group entered.';
+            } else {
+                query += ' WHERE blood_group = ?';
+                params.push(input);
+            }
+        }
+
+        const [rows] = errorMessage ? [[], []] : await dbtable.query(query, params);
+        res.render("read_donors", {
+            donorData: rows,
+            blood_group: bloodGroup || '',
+            error: errorMessage
+        });
+
     } catch (error) {
         console.error(error);
         res.send('Error loading donors page');
     }
 });
+
+
 app.get("/readpatients",async (req, res) => {
     try {
-        const [rows] = await dbtable.query('SELECT * FROM Patient');
-        res.render("read_patients",{patientData:rows});
+        const bloodGroup = req.query.blood_group;
+        const validBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+        let query = 'SELECT * FROM Patient';
+        let params = [];
+        let errorMessage = '';
+
+        if (bloodGroup && bloodGroup.trim() !== '') {
+            const input = bloodGroup.trim();
+            if (!validBloodGroups.includes(input)) {
+                errorMessage = 'Invalid blood group entered.';
+            } else {
+                query += ' WHERE blood_group = ?';
+                params.push(input);
+            }
+        }
+
+        const [rows] = errorMessage ? [[], []] : await dbtable.query(query, params);
+        res.render("read_patients", {
+            patientData: rows,
+            blood_group: bloodGroup || '',
+            error: errorMessage
+        });
+
     } catch (error) {
         console.error(error);
         res.send('Error loading patients page');
