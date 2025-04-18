@@ -31,6 +31,7 @@
                         <h3 class="xl mt-3 tracking-tighter">Address: <%=e.address%></h3>
                         <h3 class="xl mt-3 tracking-tighter">Blood Group: <%=e.blood_group%></h3>
                         <h3 class="xl mt-3 mb-6 tracking-tighter">Units Donated: <%=e.units_donated%></h3>
+                        <a class="text-yellow-400 hover:text-yellow-600" href="/medicalhistory/<%=e.donor_id%>">Show medical history</a><br><br>
                         <a class="text-blue-400 hover:text-blue-600" href="/donationhistory/<%=e.donor_id%>">All donations history</a>
                         <div class="flex gap-3 mt-10">
                             <a class="text-gray-400 hover:text-gray-600" href="/editdonor/<%=e.donor_id%>">Edit</a>

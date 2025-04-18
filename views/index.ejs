@@ -18,15 +18,15 @@
                 <% } %>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Name</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your name" name="name">
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your name" name="name" required value="<%= typeof name !== 'undefined' ? name : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Email</label>
-                    <input type="email" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email" name="email">
+                    <input type="email" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email" name="email" required value="<%= typeof email !== 'undefined' ? email : '' %>">
                 </div>
                 <div class="mb-6">
                     <label class="block mb-1 text-sm">Password</label>
-                    <input type="password" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" name="password">
+                    <input type="password" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" name="password" required value="<%= typeof password !== 'undefined' ? password : '' %>">
                 </div>
                 <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Sign Up</button>
                 <p class="mt-4 text-sm text-center">Already have an account? <a href="/login" class="text-blue-500 hover:underline">Login</a></p>

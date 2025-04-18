@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical History</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen px-8 py-6">
+  <div class="max-w-4xl mx-auto">
+    <a href="/readdonors" class="text-blue-400 hover:text-blue-600 mb-8 inline-block text-sm">← Back to All Donors</a>
+    
+    <h1 class="text-4xl font-bold mb-8 border-b border-gray-700 pb-2">
+      Medical History for <span class="text-blue-300"><%= donor.name %></span>
+    </h1>
+
+    <div class="space-y-6">
+      <div class="bg-zinc-800 rounded-xl p-6 shadow-lg">
+        <h2 class="text-lg font-semibold text-gray-300 mb-2">Infectious Diseases</h2>
+        <p class="text-gray-400">
+          <span class="font-medium text-white">Tested positive for HIV/AIDS, Hepatitis B, or Hepatitis C:</span> 
+          <i><%= donor.disease_status %></i>
+        </p>
+      </div>
+
+      <div class="bg-zinc-800 rounded-xl p-6 shadow-lg">
+        <h2 class="text-lg font-semibold text-gray-300 mb-2">Chronic Conditions</h2>
+        <p class="text-gray-400">
+          <span class="font-medium text-white">History of heart disease, high blood pressure, or diabetes:</span> 
+          <i><%= donor.chronic_conditions %></i>
+        </p>
+      </div>
+
+      <div class="bg-zinc-800 rounded-xl p-6 shadow-lg">
+        <h2 class="text-lg font-semibold text-gray-300 mb-2">Medications</h2>
+        <p class="text-gray-400">
+          <span class="font-medium text-white">Currently taking any prescription or medications (regular/temporary):</span> 
+          <i><%= donor.medications %></i>
+        </p>
+      </div>
+
+      <div class="bg-zinc-800 rounded-xl p-6 shadow-lg">
+        <h2 class="text-lg font-semibold text-gray-300 mb-2">Ongoing Treatment</h2>
+        <p class="text-gray-400">
+          <span class="font-medium text-white">Any chronic medical condition requiring ongoing treatment:</span> 
+          <i><%= donor.ongoing_conditions %></i>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

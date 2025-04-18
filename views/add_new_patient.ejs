@@ -20,35 +20,35 @@
             <form action="/addnewpatient" method="post">
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Patient Name</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's full name" name="name">
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's full name" name="name" value="<%= typeof name !== 'undefined' ? name : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Age</label>
-                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's age" name="age">
+                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's age" name="age" value="<%= typeof age !== 'undefined' ? age : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Gender</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter 'M'/'F'/'other'" name="gender">
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter 'M'/'F'/'other'" name="gender" value="<%= typeof gender !== 'undefined' ? gender : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Contact</label>
-                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's contact number" name="contact">
+                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's contact number" name="contact" value="<%= typeof contact !== 'undefined' ? contact : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Hospital Name</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's hospital name" name="hospital_name">
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's hospital name" name="hospital_name" value="<%= typeof hospital_name !== 'undefined' ? hospital_name : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Hospital Address</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's hospital address" name="hospital_address">
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter patient's hospital address" name="hospital_address" value="<%= typeof hospital_address !== 'undefined' ? hospital_address : '' %>">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Blood Group</label>
-                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Eg: AB+" name="blood_group">
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Eg: AB+" name="blood_group" value="<%= typeof blood_group !== 'undefined' ? blood_group : '' %>">
                 </div>
                 <div class="mb-6">
                     <label class="block mb-1 text-sm">Units Transfused</label>
-                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Eg: 100" name="units_transfused">
+                    <input type="number" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Eg: 100" name="units_transfused" value="<%= typeof units_transfused !== 'undefined' ? units_transfused : '' %>">
                 </div>
                 <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Add Patient</button>
             </form>

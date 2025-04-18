@@ -14,12 +14,13 @@
     <form method="POST" action="/incstock" class="flex flex-col md:flex-row gap-6 mb-10 items-center bg-zinc-900 p-6 rounded-lg shadow-lg">
         <div class="flex flex-col">
             <label for="blood_group" class="mb-2">Enter Blood Group</label>
-            <input placeholder="Eg: AB+" id="blood_group" name="blood_group" required
+            <input placeholder="Eg: AB+" id="blood_group" name="blood_group" required value ="<%= typeof blood_group !== 'undefined' ? blood_group : '' %>"
+                   type="text"
                    class="px-4 py-2 rounded-md bg-zinc-700 text-white border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div class="flex flex-col">
             <label for="units" class="mb-2">Enter Units to be Added</label>
-            <input placeholder="Eg: 100" id="units" name="units" type="number" 
+            <input placeholder="Eg: 100" id="units" name="units" type="number" value="<%= typeof units !== 'undefined' ? units : '' %>"
                    class="px-4 py-2 rounded-md bg-zinc-700 text-white border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <button type="submit"

@@ -44,7 +44,7 @@ app.post('/signup', async (req, res) => {
         const {name,email,password}=req.body;
         const [existing] = await dbtable.query('SELECT * FROM DBadmin WHERE email = ?', [email]);
         if (existing.length > 0) {
-            return res.render('index', { errorMessage: 'User with this email already exists.' });
+            return res.render('index', { errorMessage: 'User with this email already exists.',name,email,password });
         }
         const saltRounds=10;
         const hashedPassword=await bcrypt.hash(password,saltRounds);
@@ -69,12 +69,12 @@ app.post('/login', async (req, res) => {
         const {email,password}=req.body;
         const [rows] = await dbtable.query('SELECT * FROM DBadmin WHERE email = ?', [email]);
         if (rows.length === 0) {
-            return res.render('login', { errorMessage: 'Invalid email or password' });
+            return res.render('login', { errorMessage: 'Invalid email or password' ,email,password});
         }
         const user = rows[0];
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.render('login', { errorMessage: 'Invalid email or password' });
+            return res.render('login', { errorMessage: 'Invalid email or password',email,password });
         }
         const token=jwt.sign({email},process.env.JWT_SECRET);
         res.cookie("token", token, { httpOnly: true, secure: true, sameSite: 'strict' });
@@ -98,11 +98,11 @@ app.post('/incstock', async (req, res) => {
     const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
     if (!validBloodGroups.includes(blood_group)) {
         const [rows] = await dbtable.query('SELECT * FROM BloodGroup');
-        return res.render('inc_stock', { error: 'Invalid blood group entered', bloodData: rows });
+        return res.render('inc_stock', { error: 'Invalid blood group entered', bloodData: rows,blood_group, units });
     }
     if (units <= 0) {
         const [rows] = await dbtable.query('SELECT * FROM BloodGroup');
-        return res.render('inc_stock', { error: 'units donated must be greater than 0', bloodData: rows });
+        return res.render('inc_stock', { error: 'units donated must be greater than 0', bloodData: rows,blood_group, units });
     }
     try {
         await dbtable.query('UPDATE BloodGroup SET units = units + ? WHERE blood_group = ?', [units, blood_group]);
@@ -145,22 +145,22 @@ app.get("/addnewdonor", (req, res) => {
 });
 app.post("/addnewdonor", async (req, res) => {
     try {
-        const {name,age,gender,contact,address,blood_group,units_donated}=req.body;
+        const {name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions}=req.body;
         const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
 
         // Validation check
         if (age < 18 || age>65) {
-            return res.render('add_new_donor', { error: 'Age of donor must lie between 18 and 65' });
+            return res.render('add_new_donor', { error: 'Age of donor must lie between 18 and 65' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions},);
         }
 
         if (!validBloodGroups.includes(blood_group)) {
-            return res.render('add_new_donor', { error: 'Invalid blood group entered.' });
+            return res.render('add_new_donor', { error: 'Invalid blood group entered.' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions});
         }
         if( units_donated <= 0) {
-            return res.render('add_new_donor', { error: 'Units donated must be greater than 0.' });
+            return res.render('add_new_donor', { error: 'Units donated must be greater than 0.' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions});
         }
-        await dbtable.query('INSERT INTO Donor (name, age, gender, contact, address, blood_group, units_donated) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                      [name, age, gender, contact, address, blood_group, units_donated]);
+        await dbtable.query('INSERT INTO Donor (name, age, gender, contact, address, blood_group, units_donated,disease_status,chronic_conditions,medications,ongoing_conditions) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?)', 
+                      [name, age, gender, contact, address, blood_group, units_donated,disease_status,chronic_conditions,medications,ongoing_conditions]);
        
     const [rows] = await dbtable.query('SELECT LAST_INSERT_ID() AS donor_id');
     const donor_id = rows[0].donor_id;
@@ -188,10 +188,10 @@ app.post("/addnewpatient", async (req, res) => {
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
         const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
         if (!validBloodGroups.includes(blood_group)) {
-            return res.render('add_new_patient', { errorMessage: 'Invalid blood group entered.' });
+            return res.render('add_new_patient', { errorMessage: 'Invalid blood group entered.',name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused });
         }
         if( units_transfused <= 0) {
-            return res.render('add_new_patient', { errorMessage: 'Units transfused must be greater than 0.' });
+            return res.render('add_new_patient', { errorMessage: 'Units transfused must be greater than 0.' ,name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused});
         }
          try {
             await dbtable.query('CALL update_blood_stock(?, ?)', [blood_group, units_transfused]);
@@ -211,7 +211,6 @@ app.post("/addnewpatient", async (req, res) => {
         } catch (error) {
             console.error("Error inserting into Patient_logtable:", error);
         }
-       
         
         res.redirect('/readpatients');
     } catch (error) {
@@ -465,6 +464,13 @@ app.post('/adddonation/:donor_id', async (req, res) => {
         });
     }
 });
+app.get('/medicalhistory/:donor_id', async (req, res) => {
+    const donorId = req.params.donor_id;
+    const [donorRows] = await dbtable.query('SELECT * from Donor where donor_id=?',[donorId]); // fetch from Donor table
+    const donor = donorRows[0];
+    res.render('medical_history', { donor});
+});
+
 app.get('/transfusionhistory/:patient_id', async (req, res) => {
     const patientId = req.params.patient_id;
     const errorMessage = req.query.error;
@@ -510,15 +516,6 @@ app.post('/addtransfusion/:patient_id', async (req, res) => {
             });
         }
         
-        // await dbtable.query(
-        //     "INSERT INTO patient_logtable (patient_id, units_transfused, date_of_transfusion) VALUES (?, ?, ?)",
-        //     [patientId, units, date]
-        // );
-
-        // await dbtable.query(
-        //     'UPDATE Patient SET units_transfused = units_transfused + ? WHERE patient_id = ?',
-        //     [units, patientId]
-        // );
         res.redirect(`/transfusionhistory/${patientId}`);
             
     } catch (error) {
