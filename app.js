@@ -147,12 +147,18 @@ app.post("/addnewdonor", async (req, res) => {
     try {
         const {name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions}=req.body;
         const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        const validGenders=['M','F','other'];
 
         // Validation check
         if (age < 18 || age>65) {
             return res.render('add_new_donor', { error: 'Age of donor must lie between 18 and 65' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions},);
         }
-
+        if(!validGenders.includes(gender)){
+            return res.render('add_new_donor', { error: 'Invalid gender entered' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions},);
+        }
+        if(!/^\d{10}$/.test(contact)){
+            return res.render('add_new_donor', { error: 'Contact number must be 10 digits long' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions},);
+        }
         if (!validBloodGroups.includes(blood_group)) {
             return res.render('add_new_donor', { error: 'Invalid blood group entered.' ,name,age,gender,contact,address,blood_group,units_donated,disease_status,chronic_conditions,medications,ongoing_conditions});
         }
@@ -187,6 +193,18 @@ app.post("/addnewpatient", async (req, res) => {
     try {
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
         const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        const validGenders=['M','F','other'];
+        // Validation check
+        if(age<0)
+        {
+            return res.render('add_new_patient', { errorMessage: 'Invalid age entered' ,name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused},);
+        }
+        if(!validGenders.includes(gender)){
+            return res.render('add_new_patient', { errorMessage: 'Invalid gender entered' ,name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused},);
+        }
+        if(!/^\d{10}$/.test(contact)){
+            return res.render('add_new_patient', { errorMessage: 'Contact number must be 10 digits long' ,name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused},);
+        }
         if (!validBloodGroups.includes(blood_group)) {
             return res.render('add_new_patient', { errorMessage: 'Invalid blood group entered.',name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused });
         }
@@ -311,12 +329,18 @@ app.post('/updatedonor/:donor_id',async (req,res)=>{
         const donorId = parseInt(req.params.donor_id);
         const {name,age,gender,contact,address,blood_group,units_donated}=req.body;
         const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        const validGenders=['M','F','other'];
         const donor = { donor_id: donorId, name, age, gender, contact, address, blood_group, units_donated };
          // Validation check
          if (age < 18 || age > 65) {
             return res.render('edit_donor', { error: 'Age of donor must lie between 18 and 65', donor });
         }
-
+        if(!validGenders.includes(gender)){
+            return res.render('edit_donor', { error: 'Invalid gender entered' ,donor},);
+        }
+        if(!/^\d{10}$/.test(contact)){
+            return res.render('edit_donor', { error: 'Contact number must be 10 digits long' ,donor},);
+        }
         if (!validBloodGroups.includes(blood_group)) {
             return res.render('edit_donor', { error: 'Invalid blood group entered.', donor });
         }
@@ -356,9 +380,18 @@ app.post('/updatepatient/:patient_id',async (req,res)=>{
         const patientId = parseInt(req.params.patient_id);
         const {name,age,gender,contact,hospital_name,hospital_address,blood_group,units_transfused}=req.body;
         const validBloodGroups = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
+        const validGenders=['M','F','other'];
         const patient = { patient_id: patientId, name, age, gender, contact,hospital_name, hospital_address,blood_group, units_transfused };
         // Validation check
-       
+        if(age<0){
+            return res.render('edit_patient', { error: 'Invalid age entered' ,patient},);
+        }
+        if(!validGenders.includes(gender)){
+            return res.render(edit_patient, { error: 'Invalid gender entered' ,patient},);
+        }
+        if(!/^\d{10}$/.test(contact)){
+            return res.render('edit_patient', { error: 'Contact number must be 10 digits long' ,patient},);
+        }
        if (!validBloodGroups.includes(blood_group)) {
            return res.render('edit_patient', { error: 'Invalid blood group entered.', patient });
        }
