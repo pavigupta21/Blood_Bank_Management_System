@@ -13,6 +13,22 @@ app.use(express.urlencoded({ extended:true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
+const authenticateUser = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.redirect('/signup?error=Please signup or login to access this page');
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        console.error("Invalid token:", err);
+        res.clearCookie('token');
+        return res.redirect('/signup?error=Session expired. Please login again');
+    }
+};
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -39,6 +55,10 @@ app.get('/signout',async (req,res)=>{
         res.status(500).send('Error while signing out');
     }
 });
+app.get('/signup', (req, res) => {
+    const errorMessage = req.query.error;
+    res.render('index', { errorMessage });
+});
 app.post('/signup', async (req, res) => {
     try {
         const {name,email,password}=req.body;
@@ -61,7 +81,7 @@ app.post('/signup', async (req, res) => {
 app.get('/login', (req, res) => {
     res.render('login', { errorMessage: null });
 });
-app.get('/home', (req, res) => {
+app.get('/home',authenticateUser,(req, res) => {
     res.render('home');
 });
 app.post('/login', async (req, res) => {
@@ -84,6 +104,10 @@ app.post('/login', async (req, res) => {
         return res.render('login', { errorMessage: 'Database error while logging in' });
     }
 });
+
+
+
+
 app.get('/incstock', async (req, res) => {
     try {
         const [rows] = await dbtable.query('SELECT * FROM BloodGroup');
@@ -320,6 +344,7 @@ app.get('/deletedonor/:donor_id',async (req,res)=>
             res.redirect('/readdonors');
         } catch (error) {
             console.error(error);
+            
             res.status(500).send('Error deleting donor');
         }
 });

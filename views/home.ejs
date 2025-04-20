@@ -5,28 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom hover effects */
+        .button-transition {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .button-transition:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Customize header styling */
+        .header-text {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body>
-    <div class="w-full h-screen flex justify-center items-center bg-zinc-800 text-white">
-        <form class="absolute top-5 right-5 flex space-x-3">
-            <a class="bg-red-500 hover:bg-red-600 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/logout">Logout</a>
-            <a class="bg-gray-600 hover:bg-gray-700 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/signout">Sign Out</a>
-        </form>
-        <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96">
-            <h3 class="text-xl font-semibold text-center mb-4">Welcome to Blood Bank Management System</h3>
-            <div class="w-full">
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/addnewdonor">Add New Donor</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/readdonors">Read Donors</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/donorlogtable">Donor Log Table</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/incstock">Increase Stock</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/decstock">Decrease Stock</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/addnewpatient">Add New Patient</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="/readpatients">Read Patients</a>
-                <a class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-2 rounded mb-5" href="patientlogtable">Patient Log Table</a>
+<body class="bg-gray-800">
+
+    <header class="w-full py-6 bg-zinc-900 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-white">Blood Bank Management System</h1>
+            <div class="space-x-4">
+                <a href="/logout" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg button-transition">Logout</a>
+                <a href="/signout" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg button-transition">Sign Out</a>
             </div>
         </div>
-    </div>
-   
-</body>
+    </header>
 
+    <main class="flex justify-center items-center min-h-screen bg-gray-800">
+        <div class="w-full max-w-5xl p-8 bg-zinc-900 rounded-lg shadow-xl space-y-6">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-semibold text-white">Welcome to the Blood Bank Management System</h2>
+                <p class="text-lg text-gray-300 mt-2">Manage donors, patients, and stock with ease!</p>
+            </div>
+
+            <!-- Options Section -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/addnewdonor" class="text-xl font-semibold">Add New Donor</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/readdonors" class="text-xl font-semibold">Read Donors</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/donorlogtable" class="text-xl font-semibold">Donor Log Table</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/incstock" class="text-xl font-semibold">Increase Stock</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/decstock" class="text-xl font-semibold">Decrease Stock</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/addnewpatient" class="text-xl font-semibold">Add New Patient</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/readpatients" class="text-xl font-semibold">Read Patients</a>
+                </div>
+                <div class="card bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg shadow-md button-transition">
+                    <a href="/patientlogtable" class="text-xl font-semibold">Patient Log Table</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
 </html>
