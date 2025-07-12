@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Home Page</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <style>
+        /* Custom hover effects */
+        .button-transition {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .button-transition:hover {
+           transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Customize header styling */
+        .header-text {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-800">
+      <header class="w-full py-6 bg-zinc-900 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-white">Donor And Patient Portal</h1>
+            <div class="space-x-4">
+                <a href="/userlogout" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg button-transition">Logout</a>
+                <a href="/usersignout" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg button-transition">Sign Out</a>
+            </div>
+        </div>
+    </header>
+   <div class="min-h-screen flex items-center justify-center  px-4">
+  <div class="bg-zinc-900 p-10 rounded-lg shadow-lg w-full max-w-md text-center">
+    
+    <h2 class="text-white text-3xl font-semibold mb-6">Donate.Request.Heal</h2>
+    
+
+    <button onclick="window.location.href='/offerdonation/<%=user_id%>'" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md font-bold mb-3 button-transition">
+      Donate Blood
+    </button>
+
+    <button onclick="window.location.href='/requesttransfusion/<%=user_id%>'" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md font-bold mb-3 button-transition">
+      Transfuse Blood
+    </button>
+
+    <button  onclick="window.location.href='/userhome/notify/<%=user_id%>'" class="w-full bg-blue-600 hover:bg-indigo-500 text-white py-3 rounded-md font-bold button-transition">
+      Notifications
+    </button>
+
+  </div>
+</div>
+
+</body>
+</html>

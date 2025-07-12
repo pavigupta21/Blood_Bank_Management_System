@@ -17,4 +17,13 @@ const authenticateUser = (req, res, next) => {
     }
 };
 
-module.exports = authenticateUser;
+const authorizeRole = (role) => {
+    return (req, res, next) => {
+        if (!req.user || req.user.role !== role) {
+            return res.redirect('/signup?error=Forbidden: You do not have permission to access this resource');
+        }
+        next();
+    };
+};
+
+module.exports = {authenticateUser, authorizeRole};

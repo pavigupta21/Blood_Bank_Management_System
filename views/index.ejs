@@ -7,15 +7,18 @@
     <link rel="stylesheet" href="/css/output.css">
 </head>
 <body>
-    <div class="w-full h-screen flex justify-center items-center bg-zinc-800 text-white">
-        <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96">
-            <h3 class="text-xl font-semibold text-center mb-4">Create Account</h3>
-            <form action="/signup" method="post">
-                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-                    <div class="bg-red-500 text-white text-sm px-4 py-2 mb-4 rounded">
-                        <%= errorMessage %>
-                    </div>
-                <% } %>
+     <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="bg-red-500 text-white text-sm px-4 py-2">
+            <%= errorMessage %>
+        </div>
+    <% } %>
+    <div class="w-full min-h-screen flex justify-center items-center bg-zinc-800 text-white px-4">
+    <div class="flex flex-wrap gap-6 justify-center px-4 max-w-screen-lg mx-auto">
+        <!-- Donor Form -->
+        <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96 min-h-[500px] flex flex-col justify-between">
+            <h3 class="text-xl font-semibold text-center mb-4">Register As Donor/Patient</h3>
+            <form action="/usersignup" method="post" class="flex flex-col  h-full justify-between">
+                
                 <div class="mb-3">
                     <label class="block mb-1 text-sm">Name</label>
                     <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your name" name="name" required value="<%= typeof name !== 'undefined' ? name : '' %>">
@@ -28,11 +31,36 @@
                     <label class="block mb-1 text-sm">Password</label>
                     <input type="password" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" name="password" required value="<%= typeof password !== 'undefined' ? password : '' %>">
                 </div>
-                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Sign Up</button>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Register</button>
+                <p class="mt-4 text-sm text-center">Already have an account? <a href="/userlogin" class="text-blue-500 hover:underline">Login</a></p>
+            </form>
+        </div>
+
+        <div class="bg-zinc-900 p-8 rounded-lg shadow-lg w-96 min-h-[500px] flex flex-col justify-between">
+            <h3 class="text-xl font-semibold text-center mb-4">Register As Blood Bank Admin</h3>
+            <form action="/signup" method="post" class="flex flex-col justify-between h-full">
+                <div class="mb-3">
+                    <label class="block mb-1 text-sm">Name</label>
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your name" name="name" required value="<%= typeof name !== 'undefined' ? name : '' %>">
+                </div>
+                <div class="mb-3">
+                    <label class="block mb-1 text-sm">Email</label>
+                    <input type="email" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email" name="email" required value="<%= typeof email !== 'undefined' ? email : '' %>">
+                </div>
+                <div class="mb-3">
+                    <label class="block mb-1 text-sm">Password</label>
+                    <input type="password" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" name="password" required value="<%= typeof password !== 'undefined' ? password : '' %>">
+                </div>
+                <div class="mb-6">
+                    <label class="block mb-1 text-sm">Admin Key</label>
+                    <input type="text" class="w-full p-2 rounded bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your admin key" name="admin_key" required value="<%= typeof admin_key !== 'undefined' ? admin_key : '' %>">
+                </div>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Register</button>
                 <p class="mt-4 text-sm text-center">Already have an account? <a href="/login" class="text-blue-500 hover:underline">Login</a></p>
             </form>
         </div>
     </div>
+</div>
 </body>
 
 </html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/output.css" />
+  <title>Donor/Patient Notifications</title>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="bg-zinc-900 text-white p-8">
+  <a href="/userhome/<%=user_id%>" class="absolute top-4 left-4 text-blue-500 hover:text-blue-700 font-semibold ">back to home</a>
+  <h1 class="text-2xl font-bold mb-6 mt-8">Notifications</h1>
+
+ <ul id="notifications" class="space-y-4">
+  <% notifications.forEach(n => { 
+       const data = JSON.parse(n.message); 
+  %>
+    <li class="bg-zinc-700 p-4 rounded shadow-md">
+      <div class="mb-2">
+        <p class="font-semibold text-lg">
+          <% if (n.type === 'donation') { %>
+            🩸 <span class="text-red-400">Donation Offer</span>
+          <% } else if (n.type === 'transfusion') { %>
+            💉 <span class="text-blue-400">Transfusion Request</span>
+          <% } %>
+        </p>
+        <p class="text-sm text-gray-400">Status: 
+          <% if (n.status === 'pending') { %>
+            <span class="text-yellow-400">Pending</span>
+          <% } else if (n.status === 'accepted') { %>
+            <span class="text-green-400">Accepted</span>
+          <% } else { %>
+            <span class="text-red-400">Rejected</span>
+          <% } %>
+        </p>
+        <p class="text-sm text-gray-400">Created at: <%= new Date(n.created_at).toLocaleString('en-GB') %></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <% if (n.type === 'donation') { %>
+          <p><span class="font-medium">Name:</span> <%= data.name %></p>
+          <p><span class="font-medium">Age:</span> <%= data.age %></p>
+          <p><span class="font-medium">Gender:</span> <%= data.gender %></p>
+          <p><span class="font-medium">Contact:</span> <%= data.contact %></p>
+          <p><span class="font-medium">Address:</span> <%= data.address %></p>
+          <p><span class="font-medium">Blood Group:</span> <%= data.blood_group %></p>
+          <p><span class="font-medium">Disease Status:</span> <%= data.disease_status %></p>
+          <p><span class="font-medium">Chronic Conditions:</span> <%= data.chronic_conditions %></p>
+          <p><span class="font-medium">Medications:</span> <%= data.medications %></p>
+          <p><span class="font-medium">Ongoing Conditions:</span> <%= data.ongoing_conditions %></p>
+          <p><span class="font-medium">Previous Donation:</span> <%= data.previous_donation %></p>
+        <% } else if (n.type === 'transfusion') { %>
+          <p><span class="font-medium">Name:</span> <%= data.name %></p>
+          <p><span class="font-medium">Age:</span> <%= data.age %></p>
+          <p><span class="font-medium">Gender:</span> <%= data.gender %></p>
+          <p><span class="font-medium">Contact:</span> <%= data.contact %></p>
+          <p><span class="font-medium">Hospital Name:</span> <%= data.hospital_name %></p>
+          <p><span class="font-medium">Hospital Address:</span> <%= data.hospital_address %></p>
+          <p><span class="font-medium">Blood Group:</span> <%= data.blood_group %></p>
+          <p><span class="font-medium">Units Required:</span> <%= data.units_required %></p>
+        <% } %>
+      </div>
+    </li>
+  <% }); %>
+</ul>
+
+  <script>
+    const userId = "<%= user_id %>";
+    const socket = io({ query: { user_id: userId } });
+
+    socket.on('newNotification', (data) => {
+      const msg = JSON.parse(data.message);
+      const li = document.createElement('li');
+      li.className = 'bg-zinc-700 p-4 rounded shadow-md';
+      li.innerHTML = `
+        <div class="mb-2">
+          <p class="font-semibold text-lg">${data.type === 'donation' ? '🩸 <span class="text-red-400">Donation Offer</span>' : '💉 <span class="text-blue-400">Transfusion Request</span>'}</p>
+          <p class="text-sm text-gray-400">Status: <span class="text-yellow-400">Pending</span></p>
+          <p class="text-sm text-gray-400">Created at: ${new Date(data.timestamp).toLocaleString()}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <p><span class="font-medium">Name:</span> ${msg.name}</p>
+          <p><span class="font-medium">Age:</span> ${msg.age}</p>
+          <p><span class="font-medium">Gender:</span> ${msg.gender}</p>
+          <p><span class="font-medium">Contact:</span> ${msg.contact}</p>
+          <p><span class="font-medium">Address:</span> ${msg.address}</p>
+          <p><span class="font-medium">Blood Group:</span> ${msg.blood_group}</p>
+          <p><span class="font-medium">Disease Status:</span> ${msg.disease_status}</p>
+          <p><span class="font-medium">Chronic Conditions:</span> ${msg.chronic_conditions}</p>
+          <p><span class="font-medium">Medications:</span> ${msg.medications}</p>
+          <p><span class="font-medium">Ongoing Conditions:</span> ${msg.ongoing_conditions}</p>
+          <p><span class="font-medium">Previous Donation:</span> ${msg.previous_donation}</p>
+        </div>
+      `;
+      document.getElementById('notifications').prepend(li);
+    });
+  </script>
+</body>
+</html>
