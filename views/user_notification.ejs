@@ -15,7 +15,7 @@
   <% notifications.forEach(n => { 
        const data = JSON.parse(n.message); 
   %>
-    <li class="bg-zinc-700 p-4 rounded shadow-md">
+    <li class="bg-zinc-700 p-4 rounded shadow-md" data-id="<%= n.notification_id %>">
       <div class="mb-2">
         <p class="font-semibold text-lg">
           <% if (n.type === 'donation') { %>
@@ -26,11 +26,11 @@
         </p>
         <p class="text-sm text-gray-400">Status: 
           <% if (n.status === 'pending') { %>
-            <span class="text-yellow-400">Pending</span>
+            <span class="status-text text-yellow-400">Pending</span>
           <% } else if (n.status === 'accepted') { %>
-            <span class="text-green-400">Accepted</span>
+            <span class="status-text text-green-400">Accepted</span>
           <% } else { %>
-            <span class="text-red-400">Rejected</span>
+            <span class="status-text text-red-400">Rejected</span>
           <% } %>
         </p>
         <p class="text-sm text-gray-400">Created at: <%= new Date(n.created_at).toLocaleString('en-GB') %></p>
@@ -72,10 +72,12 @@
       const msg = JSON.parse(data.message);
       const li = document.createElement('li');
       li.className = 'bg-zinc-700 p-4 rounded shadow-md';
+      li.setAttribute('data-id', data.notification_id);
+
       li.innerHTML = `
         <div class="mb-2">
           <p class="font-semibold text-lg">${data.type === 'donation' ? '🩸 <span class="text-red-400">Donation Offer</span>' : '💉 <span class="text-blue-400">Transfusion Request</span>'}</p>
-          <p class="text-sm text-gray-400">Status: <span class="text-yellow-400">Pending</span></p>
+          <p class="text-sm text-gray-400">Status: <span class="status-text text-yellow-400">Pending</span></p>
           <p class="text-sm text-gray-400">Created at: ${new Date(data.timestamp).toLocaleString()}</p>
         </div>
         <div class="grid grid-cols-2 gap-2 text-sm">
@@ -94,6 +96,23 @@
       `;
       document.getElementById('notifications').prepend(li);
     });
+    socket.on('statusUpdated', (data) => {
+  const notification = document.querySelector(`li[data-id='${data.notification_id}']`);
+
+  if (!notification) return;
+
+  const statusSpan = notification.querySelector('.status-text');
+
+  statusSpan.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+  statusSpan.className = `status-text ${
+    data.status === 'accepted' ? 'text-green-500' : 'text-red-500'
+  }`;
+
+  // Remove admin action buttons if present
+  const buttonBox = notification.querySelector('.mt-4');
+  if (buttonBox) buttonBox.remove();
+});
+
   </script>
 </body>
 </html>

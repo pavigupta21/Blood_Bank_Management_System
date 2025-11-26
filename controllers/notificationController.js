@@ -136,17 +136,46 @@ const adminNotify=async(req,res)=>{
   }
 }
 
-const updateStatus = async(req,res)=>{
-    const notification_id = req.params.notification_id;
-    const {status} = req.body;
-    try{
-        await dbtable.query("UPDATE Notifications SET status = ? WHERE notification_id = ?", [status, notification_id]);
-        res.redirect('/home/notify');
-    }
+// const updateStatus = async(req,res)=>{
+//     const notification_id = req.params.notification_id;
+//     const {status} = req.body;
+//     try{
+//         await dbtable.query("UPDATE Notifications SET status = ? WHERE notification_id = ?", [status, notification_id]);
+//         res.redirect('/home/notify');
+//     }
 
-    catch(err){
-        console.error(err);
-        res.status(500).send('Error updating notification status');
-    }
-}
+//     catch(err){
+//         console.error(err);
+//         res.status(500).send('Error updating notification status');
+//     }
+// }
+const updateStatus = async (req, res) => {
+  const notification_id = req.params.notification_id;
+  const { status } = req.body;
+
+  try {
+    await dbtable.query(
+      "UPDATE Notifications SET status = ? WHERE notification_id = ?",
+      [status, notification_id]
+    );
+
+    const [rows] = await dbtable.query(
+      "SELECT * FROM Notifications WHERE notification_id = ?",
+      [notification_id]
+    );
+
+    const updatedNotification = rows[0];
+
+    // ✅ Emit realtime status update
+    const io = getIO();
+    io.to('adminRoom').emit('statusUpdated', updatedNotification);
+    io.to(`user_${updatedNotification.user_id}`).emit('statusUpdated', updatedNotification);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating notification status' });
+  }
+};
+
 module.exports = {DonationOffer, Post_DonationOffer,TransfusionRequest, Post_TransfusionRequest,userNotify, adminNotify,updateStatus};

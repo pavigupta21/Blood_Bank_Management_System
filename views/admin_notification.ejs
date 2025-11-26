@@ -39,7 +39,7 @@
   <% notifications.forEach(n => { 
        const data = JSON.parse(n.message); 
   %>
-    <li class="bg-zinc-700 p-4 rounded shadow-md">
+    <li class="bg-zinc-700 p-4 rounded shadow-md" data-id="<%= n.notification_id %>">
       <div class="mb-2">
         <p class="font-semibold text-lg">
           <% if (n.type === 'donation') { %>
@@ -50,11 +50,11 @@
         </p>
         <p class="text-sm text-gray-400">Status: 
           <% if (n.status === 'pending') { %>
-            <span class="text-yellow-400">Pending</span>
+            <span class="status-text text-yellow-400">Pending</span>
           <% } else if (n.status === 'accepted') { %>
-            <span class="text-green-400">Accepted</span>
+            <span class="status-text text-green-400">Accepted</span>
           <% } else { %>
-            <span class="text-red-400">Rejected</span>
+            <span class="status-text text-red-400">Rejected</span>
           <% } %>
         </p>
        <p class="text-sm text-gray-400">Created at: <%= new Date(n.created_at).toLocaleString('en-GB') %></p>
@@ -86,10 +86,10 @@
       </div>
       <% if (n.status === 'pending') { %>
   <div class="mt-4 flex gap-4">
-    <button onclick="handleStatusUpdate('<%= n._id %>', 'accepted', this)" class="btn-accept">
+    <button onclick="handleStatusUpdate('<%= n.notification_id %>', 'accepted', this)" class="btn-accept">
   Accept
 </button>
-    <button onclick="handleStatusUpdate('<%= n._id %>', 'rejected', this)" class="btn-reject">Reject</button>
+    <button onclick="handleStatusUpdate('<%= n.notification_id %>', 'rejected', this)" class="btn-reject">Reject</button>
   </div>
 <% } %>
     </li>
@@ -98,7 +98,7 @@
 
   <script>
     
-    const socket = io('http://localhost:4000', {
+    const socket = io( {
         query: {
             role: "admin"
         }
@@ -113,7 +113,7 @@
   const msg = JSON.parse(data.message);
   const li = document.createElement('li');
   li.className = 'bg-zinc-700 p-4 rounded shadow-md';
-
+  li.setAttribute('data-id', data.notification_id);
   const commonHTML = `
     <div class="mb-2">
       <p class="font-semibold text-lg">
@@ -121,7 +121,7 @@
           ? '🩸 <span class="text-red-400">Donation Offer</span>'
           : '💉 <span class="text-blue-400">Transfusion Request</span>'}
       </p>
-      <p class="text-sm text-gray-400">Status: <span class="text-yellow-400">Pending</span></p>
+      <p class="text-sm text-gray-400">Status: <span class="status-text text-yellow-400">Pending</span></p>
       <p class="text-sm text-gray-400">Created at: ${new Date(data.created_at).toLocaleString()}</p>
     </div>
   `;
@@ -190,9 +190,10 @@
       }
 
       // Change status text and color
-      const statusSpan = buttonElement.closest('li').querySelector('p.text-sm span');
+      const statusSpan = buttonElement.closest('li').querySelector('.status-text');
       statusSpan.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1); // Capitalize
-      statusSpan.className = newStatus === 'accepted' ? 'text-green-400' : 'text-red-400';
+      //statusSpan.className = newStatus === 'accepted' ? 'text-green-400' : 'text-red-400';
+      statusSpan.className = `status-text ${newStatus === 'accepted' ? 'text-green-400' : 'text-red-400'}`;
 
       // Remove buttons (optional)
       const buttonContainer = buttonElement.closest('.mt-4');
@@ -205,6 +206,11 @@
       alert("Status update failed.");
     }
   }
+  socket.on('newNotification', (data) => {
+  console.log("🔥 REALTIME RECEIVED ON ADMIN:", data);
+  alert("New notification arrived in real-time!");
+});
+
   </script>
 </body>
 </html>
